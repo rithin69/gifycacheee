@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Giphygram</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0082f9">
+    <meta name="apple-mobile-web-app-title" content="Giphygram">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="apple-touch-startup-image" href="images/launch.png">
+    <link rel="apple-touch-icon-precomposed" sizes="57x57" href="images/icons/apple-touch-icon-57x57.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="images/icons/apple-touch-icon-114x114.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="images/icons/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="images/icons/apple-touch-icon-144x144.png">
+    <link rel="apple-touch-icon-precomposed" sizes="60x60" href="images/icons/apple-touch-icon-60x60.png">
+    <link rel="apple-touch-icon-precomposed" sizes="120x120" href="images/icons/apple-touch-icon-120x120.png">
+    <link rel="apple-touch-icon-precomposed" sizes="76x76" href="images/icons/apple-touch-icon-76x76.png">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="images/icons/apple-touch-icon-152x152.png">
+    <link rel="icon" type="image/png" href="images/icons/favicon-196x196.png" sizes="196x196">
+    <link rel="icon" type="image/png" href="images/icons/favicon-96x96.png" sizes="96x96">
+    <link rel="icon" type="image/png" href="images/icons/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="images/icons/favicon-16x16.png" sizes="16x16">
+    <link rel="icon" type="image/png" href="images/icons/favicon-128.png" sizes="128x128">
+    <meta name="msapplication-TileColor" content="#2D91F8">
+    <meta name="msapplication-TileImage" content="images/icons/mstile-144x144.png">
+    <meta name="msapplication-square70x70logo" content="images/icons/mstile-70x70.png">
+    <meta name="msapplication-square150x150logo" content="images/icons/mstile-150x150.png">
+    <meta name="msapplication-wide310x150logo" content="images/icons/mstile-310x150.png">
+    <meta name="msapplication-square310x310logo" content="images/icons/mstile-310x310.png">
+    <link rel="stylesheet" href="vendor/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.min.js"></script>
+    <script defer src="vendor/jquery.min.js"></script>
+    <script defer src="main.js"></script>
+    <style>
+        #poisoned-message {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    background-color: red;
+    color: white;
+    padding: 10px;
+    z-index: 10000;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+        }
+
+        .navbar img {
+            margin-right: 10px;
+        }
+
+        .navbar .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            max-width: 200px;
+        }
+
+        .buttons button {
+            width: 100%;
+            padding: 0.5rem;
+            font-size: 1rem;
+            background: #66DE93;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        #subscribe-button {
+            background: #66DE93;
+        }
+
+        #capture-button {
+            background: #66DE93;
+        }
+
+        .navbar .icon {
+            margin-right: auto;
+        }
+
+        .spinner {
+            animation-name: spin;
+            animation-duration: 2000ms;
+            animation-iteration-count: infinite;
+            animation-timing-function: linear;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Camera Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        /* Responsive styling */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .navbar .buttons {
+                width: 100%;
+            }
+
+            .modal-content {
+                width: 90%;
+                padding: 15px;
+            }
+
+            button {
+                font-size: 0.9rem;
+                padding: 0.5rem 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Nav Header -->
+    <header class="navbar sticky-top navbar-expand bg-primary navbar-dark">
+        <!-- Logo -->
+        <div class="icon">
+            <img src="images/logo.png" alt="Giphygram" width="60" class="img-fluid navbar-brand">
+        </div>
+
+        <!-- Flame Button -->
+        <div class="icon">
+            <a id="update" href="#"><img width="25" src="images/flame.png"></a>
+
+            <img class="icon d-none spinner" width="20" src="images/sync.png">
+        </div>
+
+        <!-- Buttons -->
+        <div class="buttons">
+            <button id="install-button" style="display: none;">Add to Home Screen</button>
+            <button id="subscribe-button" onclick="subscribe()">Subscribe</button>
+            <button id="capture-button" onclick="openCameraModal()">Capture Image</button>
+        </div>
+    </header>
+
+    <!-- Modal for Camera Capture -->
+    <div id="cameraModal" class="modal">
+        <div class="modal-content">
+            <video id="cameraFeed" autoplay style="width: 100%;"></video>
+            <button id="captureImage" onclick="captureImage()">Capture</button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <main class="container p-1">
+
+         <!-- Poisoned Cache Message -->
+    <div id="poisoned-content" style="display: none; color: red; text-align: center; font-weight: bold; padding: 10px;">
+        Your cache has been poisoned!
+    </div>
+        <!-- Error Alert -->
+        <div class="alert alert-danger text-center m-1" style="display:none;">
+            Could not update Giphys
+        </div>
+
+        <!-- Display Captured Images -->
+        <div id="capturedImages" class="row no-gutters"></div>
+
+        <!-- Giphys -->
+        <div id="giphys" class="row no-gutters"></div>
+
+        <noscript>
+            <div class="text-center mt-5">
+                Giphygram requires JavaScript to function.<br>
+                <small>Please enable JavaScript in your browser settings.</small>
+            </div>
+        </noscript>
+    </main>
+
+    <script>
+        let deferredPrompt;
+
+        // Listen for the `beforeinstallprompt` event
+        window.addEventListener('beforeinstallprompt', (event) => {
+            // Prevent the mini-infobar from appearing on mobile
+            event.preventDefault();
+            // Store the event so it can be triggered later
+            deferredPrompt = event;
+
+            // Show the install button
+            const installButton = document.getElementById('install-button');
+            installButton.style.display = 'inline-block';
+
+            // Handle the install button click event
+            installButton.addEventListener('click', () => {
+                // Hide the install button after click
+                installButton.style.display = 'none';
+
+                // Show the install prompt
+                deferredPrompt.prompt();
+
+                // Wait for the user's response
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the A2HS prompt');
+                    } else {
+                        console.log('User dismissed the A2HS prompt');
+                    }
+                    deferredPrompt = null; // Clear the deferred prompt variable
+                });
+            });
+        });
+
+        // Optionally: Add an event listener for the `appinstalled` event to detect when the app is installed
+        window.addEventListener('appinstalled', () => {
+            console.log('PWA installed');
+        });
+    </script>
+</body>
+
+</html>
