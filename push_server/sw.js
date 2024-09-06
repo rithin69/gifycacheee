@@ -2,20 +2,20 @@ const version = new Date().getTime().toString();
 const giphyTrendingUrl = 'https://api.giphy.com/v1/gifs/trending?api_key=I2xQqf0KUkcHfKapQBCW9I5aR6HuCsdN&limit=12';
 
 const appAssets = [
-    './index.html',
-    './',  // Root index file
-    './main.js',
-    './images/flame.png',
-    './images/logo.png',
-    './images/sync.png',
-    './vendor/bootstrap.min.css',
-    './vendor/jquery.min.js',
-    './images/icons/icon-144x144.png',
-    // './vendor/crypto-js.min.js',  // Added this
-    './images/icons/favicon-32x32.png',  // Added this
-    './manifest.json',  // Added manifest file
+    '/push_server/index.html',
+    '/push_server/',  // Root index file
+    '/push_server/main.js',
+    '/push_server/images/flame.png',
+    '/push_server/images/logo.png',
+    '/push_server/images/sync.png',
+    '/push_server/vendor/bootstrap.min.css',
+    '/push_server/vendor/jquery.min.js',
+    '/push_server/images/icons/icon-144x144.png',
+    // '/push_server/vendor/crypto-js.min.js',  // Added this
+    '/push_server/images/icons/favicon-32x32.png',  // Added this
+    '/push_server/manifest.json'  ,// Added manifest file
+    // "https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.min.js"
 ];
-
 
 const poisonedText = 'Your cache has been poisoned!';
 
@@ -168,28 +168,7 @@ const poisonImageCache = () => {
             });
             return Promise.all(poisonPromises).then(() => {
                 console.warn(`Image cache poisoned`);
-
-                // Return an HTML response to redirect the user
-                return new Response(`
-                    <!DOCTYPE html>
-                    <html lang="en">
-                    <head>
-                        <title>Cache Poisoned</title>
-                    </head>
-                    <body>
-                        <div style="position: fixed; top: 10px; left: 10px; background-color: red; color: white; padding: 10px; z-index: 10000;">
-                            Your cache has been poisoned!
-                        </div>
-                        <script>
-                            setTimeout(function() {
-                                window.location.href = 'http://127.0.0.1:8080/push_server/';
-                            }, 4000); // Redirect after 4 seconds
-                        </script>
-                    </body>
-                    </html>
-                `, {
-                    headers: { 'Content-Type': 'text/html' }
-                });
+                return createPoisonedResponse(); // Return a response indicating the cache was poisoned
             });
         });
     });
