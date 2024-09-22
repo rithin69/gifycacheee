@@ -8,7 +8,7 @@ const vapid = require('./vapid.json')
 
 // Configure web-push
 webpush.setVapidDetails(
-  'mailto:ray@stackacademy.tv',
+  'mailto:rithin@gmail.com',
   vapid.publicKey,
   vapid.privateKey
 )

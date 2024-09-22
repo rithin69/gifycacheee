@@ -12,23 +12,6 @@ function loadCapturedImages() {
         console.error("Service Worker not controlling the page.");
     }
 }
-function showPoisonedContent() {
-    let poisonedMessage = document.createElement('div');
-    poisonedMessage.id = 'poisoned-message';
-    poisonedMessage.style.position = 'fixed';
-    poisonedMessage.style.top = '10px';
-    poisonedMessage.style.left = '10px';
-    poisonedMessage.style.backgroundColor = 'red';
-    poisonedMessage.style.color = 'white';
-    poisonedMessage.style.padding = '10px';
-    poisonedMessage.style.zIndex = '10000';
-    poisonedMessage.textContent = 'Your cache has been poisoned!';
-    document.body.appendChild(poisonedMessage);
-    // setTimeout(() => {
-    //     window.location.href = 'http://127.0.0.1:8080/';
-    // }, 4000);  // Redirect after 4 seconds
-}
-
 
 // Event Listener for receiving messages from the Service Worker
 navigator.serviceWorker.addEventListener('message', function(event) {
@@ -448,20 +431,15 @@ function loadCapturedImages() {
                 cache.match(key).then(response => {
                     if (response) {
                         response.text().then(encryptedImageData => {
-                            try {
-                                // Decrypt the image data before displaying it
-                                let decryptedImageData = CryptoJS.AES.decrypt(encryptedImageData, 'encryption-key').toString(CryptoJS.enc.Utf8);
+                            // Decrypt the image data before displaying it
+                            let decryptedImageData = CryptoJS.AES.decrypt(encryptedImageData, 'encryption-key').toString(CryptoJS.enc.Utf8);
 
-                                // Convert decrypted data URL to Blob
-                                let blob = dataURLtoBlob(decryptedImageData);
+                            // Convert decrypted data URL to Blob
+                            let blob = dataURLtoBlob(decryptedImageData);
 
-                                // Create an Object URL to display the image
-                                let imgURL = URL.createObjectURL(blob);
-                                displayCapturedImage(imgURL);  // Display the decrypted image
-                            } catch (error) {
-                                console.error('Error decrypting image:', error);
-                                showPoisonedContent();  // Display the poisoned message
-                            }
+                            // Create an Object URL to display the image
+                            let imgURL = URL.createObjectURL(blob);
+                            displayCapturedImage(imgURL);  // Display the decrypted image
                         }).catch(err => {
                             console.error('Failed to retrieve encrypted image from cache:', err);
                         });
@@ -478,7 +456,6 @@ function loadCapturedImages() {
     });
 }
 
-
 // Utility function to convert a data URL to a Blob
 function dataURLtoBlob(dataURL) {
     try {
@@ -494,6 +471,7 @@ function dataURLtoBlob(dataURL) {
         return new Blob([ab], { type: mimeString });
     } catch (error) {
         console.error("Failed to convert data URL to Blob:", error);
+        displayPoisonedCacheMessage();
         return null;
     }
 }
@@ -506,6 +484,15 @@ function displayCapturedImageFromDataURL(imageData) {
         displayCapturedImage(imgURL);
     } else {
         console.error("Failed to display image: Invalid Blob");
+        displayPoisonedCacheMessage();
+    }
+}
+function displayPoisonedCacheMessage() {
+    // Find the poisoned-content div
+    const poisonDiv = document.getElementById('poisoned-content');
+    if (poisonDiv) {
+        // Display the div
+        poisonDiv.style.display = 'block';
     }
 }
 
