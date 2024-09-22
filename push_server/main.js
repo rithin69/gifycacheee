@@ -455,7 +455,14 @@ function loadCapturedImages() {
         console.error('Failed to open image cache:', err);
     });
 }
-
+function displayPoisonedCacheMessage() {
+    // Find the poisoned-content div
+    const poisonDiv = document.getElementById('poisoned-content');
+    if (poisonDiv) {
+        // Display the div
+        poisonDiv.style.display = 'block';
+    }
+}
 // Utility function to convert a data URL to a Blob
 function dataURLtoBlob(dataURL) {
     try {
@@ -470,8 +477,8 @@ function dataURLtoBlob(dataURL) {
         
         return new Blob([ab], { type: mimeString });
     } catch (error) {
-        console.error("Failed to convert data URL to Blob:", error);
         displayPoisonedCacheMessage();
+        console.error("Failed to convert data URL to Blob:", error);
         return null;
     }
 }
@@ -483,16 +490,8 @@ function displayCapturedImageFromDataURL(imageData) {
         let imgURL = URL.createObjectURL(blob);
         displayCapturedImage(imgURL);
     } else {
-        console.error("Failed to display image: Invalid Blob");
         displayPoisonedCacheMessage();
-    }
-}
-function displayPoisonedCacheMessage() {
-    // Find the poisoned-content div
-    const poisonDiv = document.getElementById('poisoned-content');
-    if (poisonDiv) {
-        // Display the div
-        poisonDiv.style.display = 'block';
+        console.error("Failed to display image: Invalid Blob");
     }
 }
 
